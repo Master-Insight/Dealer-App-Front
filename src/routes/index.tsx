@@ -1,6 +1,7 @@
-import { LoginForm } from '@/components/LoginForm'
 import { createFileRoute } from '@tanstack/react-router'
 
+import { LoginForm } from '@/features/auth/components/login-form'
+import { AuthLayout } from '@/layouts/auth-layout'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -8,8 +9,8 @@ export const Route = createFileRoute('/')({
 
 function App() {
   return (
-    <div className='grid place-items-center h-screen'>
+    <AuthLayout>
       <LoginForm />
-    </div>
+    </AuthLayout>
   )
 }

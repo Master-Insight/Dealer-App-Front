@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
+import { ThemeProvider } from './components/providers/theme-provider.tsx'
+import { AuthProvider } from './features/auth/providers/auth-provider.tsx'
+import { createAuthStore } from './features/auth/store/auth-store.ts'
+import { createAuthRouterContext } from './features/auth/utils/auth-context.ts'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
@@ -10,13 +14,15 @@ import { routeTree } from './routeTree.gen'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 
-// Create a new router instance
-
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
+const authStore = createAuthStore()
+const authRouterContext = createAuthRouterContext(authStore)
+
 const router = createRouter({
   routeTree,
   context: {
     ...TanStackQueryProviderContext,
+    auth: authRouterContext,
   },
   defaultPreload: 'intent',
   scrollRestoration: true,
@@ -38,13 +44,14 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
+        <AuthProvider store={authStore}>
+          <ThemeProvider>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </AuthProvider>
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )
 }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals()
