@@ -14,7 +14,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/features/auth/hooks/use-auth.ts'
 
-export function LoginForm() {
+type LoginDestination = '/dashboard' | '/clients'
+
+interface LoginFormProps {
+  redirectTo?: LoginDestination
+}
+
+export function LoginForm({ redirectTo }: LoginFormProps) {
   const navigate = useNavigate()
   const { signInWithPassword, isLoading, error, isMocked } = useAuth()
   const [email, setEmail] = useState('')
@@ -26,7 +32,8 @@ export function LoginForm() {
     setFormError(null)
     try {
       await signInWithPassword({ email, password })
-      navigate({ to: '/dashboard' })
+      const destination: LoginDestination = redirectTo ?? '/dashboard'
+      navigate({ to: destination })
     } catch (err) {
       const message =
         err instanceof Error
