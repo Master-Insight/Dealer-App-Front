@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+// TODO mock dashboard
 const MOCKED_METRICS = [
   { label: 'Gestiones activas', value: 18, trend: '+12% vs semana pasada' },
   { label: 'Autos disponibles', value: 42, trend: '8 reservas confirmadas' },

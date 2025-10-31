@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateRouteRouteImport } from './routes/_private/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrivateDashboardIndexRouteImport } from './routes/_private/dashboard/index'
+import { Route as PrivateClientsIndexRouteImport } from './routes/_private/clients/index'
 
 const PrivateRouteRoute = PrivateRouteRouteImport.update({
   id: '/_private',
@@ -27,27 +28,40 @@ const PrivateDashboardIndexRoute = PrivateDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateClientsIndexRoute = PrivateClientsIndexRouteImport.update({
+  id: '/clients/',
+  path: '/clients/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/clients': typeof PrivateClientsIndexRoute
   '/dashboard': typeof PrivateDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clients': typeof PrivateClientsIndexRoute
   '/dashboard': typeof PrivateDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_private': typeof PrivateRouteRouteWithChildren
+  '/_private/clients/': typeof PrivateClientsIndexRoute
   '/_private/dashboard/': typeof PrivateDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths: '/' | '/clients' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/_private' | '/_private/dashboard/'
+  to: '/' | '/clients' | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/_private'
+    | '/_private/clients/'
+    | '/_private/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,14 +92,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateDashboardIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/clients/': {
+      id: '/_private/clients/'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof PrivateClientsIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
   }
 }
 
 interface PrivateRouteRouteChildren {
+  PrivateClientsIndexRoute: typeof PrivateClientsIndexRoute
   PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
+  PrivateClientsIndexRoute: PrivateClientsIndexRoute,
   PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
 }
 
