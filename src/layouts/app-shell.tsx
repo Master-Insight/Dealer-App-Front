@@ -11,7 +11,7 @@ import { useAuth } from '@/features/auth/hooks/use-auth'
 interface NavigationItem {
   label: string
   description: string
-  to?: '/dashboard'
+  to?: '/dashboard' | '/clients'
   badge?: string
 }
 
@@ -19,8 +19,8 @@ const NAVIGATION: Array<NavigationItem> = [
   { label: 'Inicio', to: '/dashboard', description: 'Resumen comercial' },
   {
     label: 'Clientes',
+    to: '/clients',
     description: 'Directorio y actividades',
-    badge: 'Fase 1',
   },
   {
     label: 'Productos',

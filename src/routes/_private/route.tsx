@@ -6,7 +6,12 @@ export const Route = createFileRoute('/_private')({
   beforeLoad: async ({ context, location }) => {
     const state = await context.auth.waitForAuthReady()
     if (!state.user) {
-      throw redirect({ to: '/', search: { redirect: location.href } })
+      throw redirect({
+        to: '/',
+        search: {
+          redirect: location.pathname as '/dashboard' | '/clients' | undefined,
+        },
+      })
     }
   },
   component: PrivateLayout,
