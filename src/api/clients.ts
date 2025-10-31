@@ -36,6 +36,8 @@ function buildUrl(path: string, query?: RequestOptions['query']) {
 
   return url.toString()
 }
+// Ejemplo de uso: buildUrl('/products', { limit: 10, page: 2 })
+// → "http://localhost:8000/products?limit=10&page=2"
 
 export class ApiClient {
   async request<TResponse>(path: string, options: RequestOptions = {}) {
@@ -70,6 +72,7 @@ export class ApiClient {
     const data = (await response.json()) as TResponse
     return data
   }
+  // Ejemplo de uso: const deals = await apiClient.request<Deal[]>('/deals', { method: 'GET' })
 
   login(body: { email: string; password: string }) {
     return this.request<{
