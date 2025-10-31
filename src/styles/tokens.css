@@ -1,0 +1,45 @@
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f6fa;
+  --bg-soft: #ffffff;
+  --fg: #0a2540;
+  --fg-muted: #334e68;
+  --brand: #2d8eff;
+  --brand-alt: #32d583;
+  --brand-accent: #2d8eff;
+  --border-soft: rgba(10, 37, 64, 0.08);
+  --shadow-soft: 0 6px 24px rgba(10, 37, 64, 0.12);
+  --radius-xl2: 1rem;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a2540;
+  --bg-soft: #0f3157;
+  --fg: #ffffff;
+  --fg-muted: #d1d5db;
+  --brand: #2d8eff;
+  --brand-alt: #32d583;
+  --brand-accent: #32d583;
+  --border-soft: rgba(255, 255, 255, 0.12);
+  --shadow-soft: 0 10px 32px rgba(2, 14, 32, 0.6);
+  --radius-xl2: 1rem;
+}
+
+:root {
+  --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Menlo", monospace;
+}
+
+[data-theme] body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+}
