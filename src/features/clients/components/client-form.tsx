@@ -31,8 +31,10 @@ export function ClientForm({
     name: '',
     phone: '',
     email: '',
-    documentId: '',
-    notes: '',
+    dni: '',
+    address: '',
+    city: '',
+    province: '',
   })
   const [formError, setFormError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -82,12 +84,20 @@ export function ClientForm({
         next.email = match.email ?? ''
         changed = true
       }
-      if ((prev.documentId || '') !== (match.documentId ?? '')) {
-        next.documentId = match.documentId ?? ''
+      if ((prev.dni || '') !== (match.dni ?? '')) {
+        next.dni = match.dni ?? ''
         changed = true
       }
-      if ((prev.notes || '') !== (match.notes ?? '')) {
-        next.notes = match.notes ?? ''
+      if ((prev.address || '') !== (match.address ?? '')) {
+        next.address = match.address ?? ''
+        changed = true
+      }
+      if ((prev.city || '') !== (match.city ?? '')) {
+        next.city = match.city ?? ''
+        changed = true
+      }
+      if ((prev.province || '') !== (match.province ?? '')) {
+        next.province = match.province ?? ''
         changed = true
       }
 
@@ -109,8 +119,10 @@ export function ClientForm({
       name: client.name,
       phone: client.phone,
       email: client.email ?? '',
-      documentId: client.documentId ?? '',
-      notes: client.notes ?? '',
+      dni: client.dni ?? '',
+      address: client.address ?? '',
+      city: client.city ?? '',
+      province: client.province ?? '',
     })
     setFormError(null)
     setSuccessMessage('Cliente existente cargado desde el historial.')
@@ -139,16 +151,20 @@ export function ClientForm({
         name: formState.name,
         phone: formState.phone,
         email: formState.email || null,
-        documentId: formState.documentId || null,
-        notes: formState.notes || null,
+        dni: formState.dni || null,
+        address: formState.address || null,
+        city: formState.city || null,
+        province: formState.province || null,
       })
       setSuccessMessage('Cliente creado correctamente.')
       setFormState({
         name: '',
         phone: '',
         email: '',
-        documentId: '',
-        notes: '',
+        dni: '',
+        address: '',
+        city: '',
+        province: '',
       })
       onClientCreated?.(client)
     } catch (error) {
@@ -174,6 +190,7 @@ export function ClientForm({
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Nombre */}
           <div className="space-y-2">
             <Label htmlFor="client-name">Nombre completo</Label>
             <Input
@@ -214,6 +231,7 @@ export function ClientForm({
             ) : null}
           </div>
 
+          {/* Teléfono */}
           <div className="space-y-2">
             <Label htmlFor="client-phone">Teléfono</Label>
             <Input
@@ -232,6 +250,7 @@ export function ClientForm({
             ) : null}
           </div>
 
+          {/* Email y DNI */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="client-email">Email (opcional)</Label>
@@ -249,24 +268,50 @@ export function ClientForm({
               <Input
                 id="client-document"
                 placeholder="Ej: 30999888"
-                value={formState.documentId}
-                onChange={handleInputChange('documentId')}
+                value={formState.dni}
+                onChange={handleInputChange('dni')}
                 autoComplete="off"
               />
             </div>
           </div>
 
+          {/* Dirección y ciudad */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="client-address">Dirección</Label>
+              <Input
+                id="client-address"
+                placeholder="Ej: Av. Siempre Viva 742"
+                value={formState.address}
+                onChange={handleInputChange('address')}
+                autoComplete="street-address"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="client-city">Ciudad</Label>
+              <Input
+                id="client-city"
+                placeholder="Ej: Córdoba"
+                value={formState.city}
+                onChange={handleInputChange('city')}
+                autoComplete="address-level2"
+              />
+            </div>
+          </div>
+
+          {/* Provincia */}
           <div className="space-y-2">
-            <Label htmlFor="client-notes">Notas internas</Label>
+            <Label htmlFor="client-province">Provincia</Label>
             <Input
-              id="client-notes"
-              placeholder="Preferencias, referencias, historial..."
-              value={formState.notes}
-              onChange={handleInputChange('notes')}
-              autoComplete="off"
+              id="client-province"
+              placeholder="Ej: Córdoba"
+              value={formState.province}
+              onChange={handleInputChange('province')}
+              autoComplete="address-level1"
             />
           </div>
 
+          {/* Mensajes */}
           {formError ? (
             <p className="text-sm font-medium text-destructive">{formError}</p>
           ) : null}
@@ -274,6 +319,7 @@ export function ClientForm({
             <p className="text-sm font-semibold text-brand">{successMessage}</p>
           ) : null}
 
+          {/* Botón */}
           <Button
             type="submit"
             className="w-full md:w-auto"

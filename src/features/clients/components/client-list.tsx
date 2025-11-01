@@ -32,11 +32,11 @@ function EmptyState() {
 }
 
 function ClientRow({ client }: { client: Client }) {
-  const createdAt = useMemo(
-    () => new Date(client.createdAt),
-    [client.createdAt],
+  const created_at = useMemo(
+    () => new Date(client.created_at),
+    [client.created_at],
   )
-  const createdLabel = createdAt.toLocaleDateString(undefined, {
+  const createdLabel = created_at.toLocaleDateString(undefined, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -57,9 +57,9 @@ function ClientRow({ client }: { client: Client }) {
               {client.email}
             </span>
           ) : null}
-          {client.documentId ? (
+          {client.dni ? (
             <span className="rounded-full border border-border/40 px-2 py-0.5 text-[0.65rem] uppercase tracking-wider">
-              DNI {client.documentId}
+              DNI {client.dni}
             </span>
           ) : null}
         </div>

@@ -4,17 +4,22 @@ export interface Client {
   name: string
   phone: string
   email?: string | null
-  documentId?: string | null
-  notes?: string | null
-  createdAt: string
+  dni?: string | null
+  address?: string | null
+  city?: string | null
+  province?: string | null
+  created_at: string
 }
 
 export interface CreateClientInput {
+  company_id?: string
   name: string
   phone: string
   email?: string | null
-  documentId?: string | null
-  notes?: string | null
+  dni?: string | null
+  address?: string | null
+  city?: string | null
+  province?: string | null
 }
 
 export type ClientSearchParams = {
