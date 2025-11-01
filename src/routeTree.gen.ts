@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateRouteRouteImport } from './routes/_private/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PrivateProductsIndexRouteImport } from './routes/_private/products/index'
+import { Route as PrivateDealsIndexRouteImport } from './routes/_private/deals/index'
 import { Route as PrivateDashboardIndexRouteImport } from './routes/_private/dashboard/index'
 import { Route as PrivateClientsIndexRouteImport } from './routes/_private/clients/index'
 
@@ -29,6 +30,11 @@ const PrivateProductsIndexRoute = PrivateProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateDealsIndexRoute = PrivateDealsIndexRouteImport.update({
+  id: '/deals/',
+  path: '/deals/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
 const PrivateDashboardIndexRoute = PrivateDashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clients': typeof PrivateClientsIndexRoute
   '/dashboard': typeof PrivateDashboardIndexRoute
+  '/deals': typeof PrivateDealsIndexRoute
   '/products': typeof PrivateProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clients': typeof PrivateClientsIndexRoute
   '/dashboard': typeof PrivateDashboardIndexRoute
+  '/deals': typeof PrivateDealsIndexRoute
   '/products': typeof PrivateProductsIndexRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/_private': typeof PrivateRouteRouteWithChildren
   '/_private/clients/': typeof PrivateClientsIndexRoute
   '/_private/dashboard/': typeof PrivateDashboardIndexRoute
+  '/_private/deals/': typeof PrivateDealsIndexRoute
   '/_private/products/': typeof PrivateProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clients' | '/dashboard' | '/products'
+  fullPaths: '/' | '/clients' | '/dashboard' | '/deals' | '/products'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/clients' | '/dashboard' | '/products'
+  to: '/' | '/clients' | '/dashboard' | '/deals' | '/products'
   id:
     | '__root__'
     | '/'
     | '/_private'
     | '/_private/clients/'
     | '/_private/dashboard/'
+    | '/_private/deals/'
     | '/_private/products/'
   fileRoutesById: FileRoutesById
 }
@@ -102,6 +112,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateProductsIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/deals/': {
+      id: '/_private/deals/'
+      path: '/deals'
+      fullPath: '/deals'
+      preLoaderRoute: typeof PrivateDealsIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
     '/_private/dashboard/': {
       id: '/_private/dashboard/'
       path: '/dashboard'
@@ -122,12 +139,14 @@ declare module '@tanstack/react-router' {
 interface PrivateRouteRouteChildren {
   PrivateClientsIndexRoute: typeof PrivateClientsIndexRoute
   PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
+  PrivateDealsIndexRoute: typeof PrivateDealsIndexRoute
   PrivateProductsIndexRoute: typeof PrivateProductsIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateClientsIndexRoute: PrivateClientsIndexRoute,
   PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
+  PrivateDealsIndexRoute: PrivateDealsIndexRoute,
   PrivateProductsIndexRoute: PrivateProductsIndexRoute,
 }
 
