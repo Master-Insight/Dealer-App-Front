@@ -188,29 +188,27 @@ export async function createClientApi(
     body: payload,
   })
 
-  if (!response.success || !response.data) {
-    throw new Error('Error al crear el cliente.')
-  }
-
   return mapClient(response.data)
 }
 
 // 🔹 MOCK MODE
-async function listClientsMock(): Promise<Array<Client>> {
-  return seedClients
+function listClientsMock(): Promise<Array<Client>> {
+  return Promise.resolve(seedClients)
 }
 
-async function searchClientsMock(query: string): Promise<Array<Client>> {
+function searchClientsMock(query: string): Promise<Array<Client>> {
   const normalized = query.trim().toLowerCase()
-  if (!normalized) return seedClients
-  return seedClients.filter(
-    (client) =>
-      client.name.toLowerCase().includes(normalized) ||
-      client.phone.includes(normalized),
+  if (!normalized) return Promise.resolve(seedClients)
+  return Promise.resolve(
+    seedClients.filter(
+      (client) =>
+        client.name.toLowerCase().includes(normalized) ||
+        client.phone.includes(normalized),
+    ),
   )
 }
 
-async function createClientMock(input: CreateClientInput): Promise<Client> {
+function createClientMock(input: CreateClientInput): Promise<Client> {
   const client: Client = {
     id: `mock-${Math.random().toString(36).slice(2, 8)}`,
     name: input.name,
@@ -223,7 +221,7 @@ async function createClientMock(input: CreateClientInput): Promise<Client> {
     created_at: new Date().toISOString(),
   }
   seedClients.unshift(client)
-  return client
+  return Promise.resolve(client)
 }
 
 // 🔹 EXPORT SELECTOR
