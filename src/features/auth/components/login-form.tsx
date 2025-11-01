@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/features/auth/hooks/use-auth.ts'
 
-type LoginDestination = '/dashboard' | '/clients'
+type LoginDestination = '/dashboard' | '/clients' | '/products' | '/deals'
 
 interface LoginFormProps {
   redirectTo?: LoginDestination

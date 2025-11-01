@@ -9,7 +9,12 @@ export const Route = createFileRoute('/_private')({
       throw redirect({
         to: '/',
         search: {
-          redirect: location.pathname as '/dashboard' | '/clients' | undefined,
+          redirect: location.pathname as
+            | '/dashboard'
+            | '/clients'
+            | '/products'
+            | '/deals'
+            | undefined,
         },
       })
     }

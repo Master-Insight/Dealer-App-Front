@@ -6,7 +6,12 @@ import { AuthLayout } from '@/layouts/auth-layout'
 
 const loginSearchSchema = z.object({
   redirect: z
-    .union([z.literal('/dashboard'), z.literal('/clients')])
+    .union([
+      z.literal('/dashboard'),
+      z.literal('/clients'),
+      z.literal('/products'),
+      z.literal('/deals'),
+    ])
     .optional(),
 })
 
@@ -21,12 +26,14 @@ export const Route = createFileRoute('/')({
   component: App,
 })
 
+type LoginDestination = '/dashboard' | '/clients' | '/products' | '/deals'
+
 function App() {
   const { redirect: redirectTo } = Route.useSearch()
 
   return (
     <AuthLayout>
-      <LoginForm redirectTo={redirectTo} />
+      <LoginForm redirectTo={redirectTo as LoginDestination | undefined} />
     </AuthLayout>
   )
 }

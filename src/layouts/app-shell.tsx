@@ -11,8 +11,7 @@ import { useAuth } from '@/features/auth/hooks/use-auth'
 interface NavigationItem {
   label: string
   description: string
-  to?: '/dashboard' | '/clients'
-  badge?: string
+  to: '/dashboard' | '/clients' | '/products' | '/deals'
 }
 
 const NAVIGATION: Array<NavigationItem> = [
@@ -24,10 +23,10 @@ const NAVIGATION: Array<NavigationItem> = [
   },
   {
     label: 'Productos',
+    to: '/products',
     description: 'Stock y disponibilidad',
-    badge: 'Fase 1',
   },
-  { label: 'Gestiones', description: 'Agenda y seguimiento', badge: 'Fase 1' },
+  { label: 'Gestiones', to: '/deals', description: 'Agenda y seguimiento' },
 ]
 
 export function AppShellLayout({ children }: PropsWithChildren) {
@@ -46,27 +45,15 @@ export function AppShellLayout({ children }: PropsWithChildren) {
             <ul className="space-y-2">
               {NAVIGATION.map((item) => (
                 <li key={item.label}>
-                  {item.to ? (
-                    <Link
-                      to={item.to}
-                      className="group flex flex-col rounded-xl border border-transparent bg-card px-4 py-3 text-left shadow-sm transition hover:border-brand/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
-                    >
-                      <span className="font-medium">{item.label}</span>
-                      <span className="text-xs text-foreground/70">
-                        {item.description}
-                      </span>
-                    </Link>
-                  ) : (
-                    <div className="group flex flex-col rounded-xl border border-dashed border-border/60 bg-card/60 px-4 py-3 text-foreground/60">
-                      <span className="font-medium">{item.label}</span>
-                      <span className="text-xs">{item.description}</span>
-                      {item.badge ? (
-                        <span className="mt-1 text-[0.65rem] uppercase tracking-wider text-brand">
-                          {item.badge}
-                        </span>
-                      ) : null}
-                    </div>
-                  )}
+                  <Link
+                    to={item.to}
+                    className="group flex flex-col rounded-xl border border-transparent bg-card px-4 py-3 text-left shadow-sm transition hover:border-brand/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+                  >
+                    <span className="font-medium">{item.label}</span>
+                    <span className="text-xs text-foreground/70">
+                      {item.description}
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>
