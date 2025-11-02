@@ -9,6 +9,7 @@ import {
   UserRoundIcon,
 } from 'lucide-react'
 
+import type { DealStatus, DealWithRelations } from '@/features/deals/types/deal'
 import {
   Card,
   CardContent,
@@ -23,27 +24,26 @@ import {
   useDealsQuery,
   useUpdateDealStatusMutation,
 } from '@/features/deals/hooks/use-deals'
-import type { DealStatus, DealWithRelations } from '@/features/deals/types/deal'
 import { cn } from '@/lib/utils'
 
 const STATUS_META: Record<DealStatus, { label: string; tone: string }> = {
-  pending: {
+  pendiente: {
     label: 'Pendiente',
     tone: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-200',
   },
-  assigned: {
+  asignada: {
     label: 'Asignada',
     tone: 'bg-brand/10 text-brand',
   },
-  completed: {
+  realizada: {
     label: 'Realizada',
     tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
   },
-  lost: {
+  perdida: {
     label: 'Perdida',
     tone: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300',
   },
-  in_collection: {
+  en_cobro: {
     label: 'En cobro',
     tone: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
   },
@@ -51,11 +51,11 @@ const STATUS_META: Record<DealStatus, { label: string; tone: string }> = {
 
 const STATUS_FILTERS: Array<{ value: DealStatus | 'all'; label: string }> = [
   { value: 'all', label: 'Todas' },
-  { value: 'pending', label: 'Pendientes' },
-  { value: 'assigned', label: 'Asignadas' },
-  { value: 'completed', label: 'Realizadas' },
-  { value: 'in_collection', label: 'En cobro' },
-  { value: 'lost', label: 'Perdidas' },
+  { value: 'pendiente', label: 'Pendientes' },
+  { value: 'asignada', label: 'Asignadas' },
+  { value: 'realizada', label: 'Realizadas' },
+  { value: 'en_cobro', label: 'En cobro' },
+  { value: 'perdida', label: 'Perdidas' },
 ]
 
 function formatDateTime(value: string) {
@@ -84,10 +84,11 @@ function DealNotes({ deal }: { deal: DealWithRelations }) {
           key={note.id}
           className="rounded-xl border border-border/40 bg-card/80 px-3 py-2 text-xs"
         >
-          <p className="font-semibold text-foreground">{note.author}</p>
+          {/* // TODO reemplazar por nombre usaurio de la nota */}
+          <p className="font-semibold text-foreground">{note.user_id}</p>
           <p className="text-foreground/70">{note.content}</p>
           <p className="text-[0.65rem] uppercase tracking-[0.35em] text-foreground/50">
-            {formatDateTime(note.createdAt)}
+            {formatDateTime(note.created_at)}
           </p>
         </li>
       ))}
@@ -162,7 +163,7 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
           </h3>
           <p className="text-xs text-foreground/70">
             <UserRoundIcon className="mr-2 inline size-4 text-brand" />
-            {deal.advisor}
+            {deal.advisor_id}
           </p>
         </div>
         <span
@@ -182,12 +183,19 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
         </p>
         {deal.product ? (
           <p>
-            <strong>Producto:</strong> {deal.product.name}
+            <strong>Producto:</strong>{' '}
+            {deal.product.brand +
+              ' ' +
+              deal.product.model +
+              ' ' +
+              deal.product.variant +
+              ' - ' +
+              deal.product.year}
           </p>
         ) : null}
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] text-brand">
           <CalendarClockIcon className="size-4" />{' '}
-          {formatDateTime(deal.scheduledAt)}
+          {formatDateTime(deal.scheduled_for)}
         </p>
       </section>
 

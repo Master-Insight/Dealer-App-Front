@@ -8,6 +8,7 @@ import {
   UserRoundPlusIcon,
 } from 'lucide-react'
 
+import type { DealStatus } from '@/features/deals/types/deal'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -20,7 +21,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useClientsQuery } from '@/features/clients/hooks/use-clients'
 import { useCreateDealMutation } from '@/features/deals/hooks/use-deals'
-import type { DealStatus } from '@/features/deals/types/deal'
 import { useProductsQuery } from '@/features/products/hooks/use-products'
 
 const STATUS_OPTIONS: Array<{ value: DealStatus; label: string }> = [

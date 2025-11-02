@@ -11,14 +11,16 @@ export type DealStatus =
 
 export interface DealNote {
   id: string
-  content: string
+  deal_id: string
   created_at: string
   user_id: string
   text: string
+  content: string
 }
 
 export interface Deal {
   id: string
+  company_id?: string | null
   advisor_id?: string | null
   client_id: string
   product_id?: string | null
@@ -26,6 +28,7 @@ export interface Deal {
   status: DealStatus
   // notes?: string | null
   created_at: string
+  updated_at: string
   notes: Array<DealNote>
 }
 
@@ -50,6 +53,7 @@ export interface UpdateDealStatusInput {
 }
 
 export interface AddDealNoteInput {
+  deal_id: string
   user_id: string
   text: string
 }
