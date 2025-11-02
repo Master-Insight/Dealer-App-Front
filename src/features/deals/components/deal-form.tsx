@@ -22,13 +22,14 @@ import { Label } from '@/components/ui/label'
 import { useClientsQuery } from '@/features/clients/hooks/use-clients'
 import { useCreateDealMutation } from '@/features/deals/hooks/use-deals'
 import { useProductsQuery } from '@/features/products/hooks/use-products'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 
 const STATUS_OPTIONS: Array<{ value: DealStatus; label: string }> = [
-  { value: 'pending', label: 'Pendiente' },
-  { value: 'assigned', label: 'Asignada' },
-  { value: 'completed', label: 'Realizada' },
-  { value: 'in_collection', label: 'En cobro' },
-  { value: 'lost', label: 'Perdida' },
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'asignada', label: 'Asignada' },
+  { value: 'realizada', label: 'Realizada' },
+  { value: 'en_cobro', label: 'En cobro' },
+  { value: 'perdida', label: 'Perdida' },
 ]
 
 function toLocalDateTimeInput(date: Date) {
@@ -39,27 +40,26 @@ function toLocalDateTimeInput(date: Date) {
 }
 
 interface DealFormState {
-  title: string
-  advisor: string
+  advisorId: string
   clientId: string
   productId: string
-  scheduledAt: string
+  scheduledFor: string
   status: DealStatus
   note: string
 }
 
 export function DealForm() {
+  const { user } = useAuth()
   const { data: clients = [] } = useClientsQuery()
   const { data: products = [] } = useProductsQuery()
   const createDealMutation = useCreateDealMutation()
 
   const [formState, setFormState] = useState<DealFormState>(() => ({
-    title: '',
-    advisor: '',
-    clientId: clients[0]?.id ?? '',
+    advisorId: user?.id ?? '',
+    clientId: '',
     productId: '',
-    scheduledAt: toLocalDateTimeInput(new Date()),
-    status: 'pending',
+    scheduledFor: toLocalDateTimeInput(new Date()),
+    status: 'pendiente',
     note: '',
   }))
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -67,9 +67,16 @@ export function DealForm() {
 
   const upcomingClients = useMemo(() => clients.slice(0, 25), [clients])
   const availableProducts = useMemo(
-    () => products.filter((product) => product.status !== 'retired'),
+    () => products.filter((product) => product.state !== 'baja'),
     [products],
   )
+
+  useEffect(() => {
+    setFormState((prev) => ({
+      ...prev,
+      advisorId: user?.id ?? prev.advisorId,
+    }))
+  }, [user?.id])
 
   useEffect(() => {
     if (!formState.clientId && clients.length > 0) {
@@ -98,21 +105,25 @@ export function DealForm() {
       return
     }
 
+    if (!formState.advisorId) {
+      setErrorMessage('No se pudo determinar el asesor asignado.')
+      return
+    }
+
     try {
       await createDealMutation.mutateAsync({
-        title: formState.title || 'Seguimiento comercial',
-        advisor: formState.advisor || 'Asesor asignado',
-        clientId: formState.clientId,
-        productId: formState.productId || null,
-        scheduledAt: new Date(formState.scheduledAt).toISOString(),
+        advisor_id: formState.advisorId,
+        client_id: formState.clientId,
+        product_id: formState.productId || null,
+        scheduled_for: new Date(formState.scheduledFor).toISOString(),
         status: formState.status,
-        note: formState.note || null,
+        notes: formState.note || null,
       })
 
       setSuccessMessage('Gestión creada correctamente.')
       setFormState((prev) => ({
         ...prev,
-        title: '',
+        productId: '',
         note: '',
       }))
     } catch (error) {
@@ -138,16 +149,6 @@ export function DealForm() {
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="deal-title">Título</Label>
-            <Input
-              id="deal-title"
-              placeholder="Ej: Seguimiento test drive"
-              value={formState.title}
-              onChange={handleChange('title')}
-            />
-          </div>
-
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="deal-client">Cliente</Label>
@@ -166,12 +167,12 @@ export function DealForm() {
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="deal-advisor">Asesor</Label>
+              <Label htmlFor="deal-advisor">Asesor asignado</Label>
               <Input
                 id="deal-advisor"
-                placeholder="Ej: Florencia Gómez"
-                value={formState.advisor}
-                onChange={handleChange('advisor')}
+                placeholder="ID del asesor"
+                value={formState.advisorId}
+                onChange={handleChange('advisorId')}
               />
             </div>
           </div>
@@ -186,11 +187,21 @@ export function DealForm() {
                 onChange={handleChange('productId')}
               >
                 <option value="">Sin producto asignado</option>
-                {availableProducts.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name}
-                  </option>
-                ))}
+                {availableProducts.map((product) => {
+                  const label = [
+                    product.brand,
+                    product.model,
+                    product.variant ?? '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+
+                  return (
+                    <option key={product.id} value={product.id}>
+                      {label || 'Producto sin nombre'}
+                    </option>
+                  )
+                })}
               </select>
             </div>
             <div className="space-y-2">
@@ -199,8 +210,8 @@ export function DealForm() {
                 <Input
                   id="deal-date"
                   type="datetime-local"
-                  value={formState.scheduledAt}
-                  onChange={handleChange('scheduledAt')}
+                  value={formState.scheduledFor}
+                  onChange={handleChange('scheduledFor')}
                 />
                 <CalendarIcon className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-foreground/60" />
               </div>

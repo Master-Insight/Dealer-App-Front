@@ -192,11 +192,16 @@ export async function createClientApi(
 }
 
 // 🔹 MOCK MODE
-function listClientsMock(): Promise<Array<Client>> {
+function listClientsMock(
+  _options?: ClientServiceOptions,
+): Promise<Array<Client>> {
   return Promise.resolve(seedClients)
 }
 
-function searchClientsMock(query: string): Promise<Array<Client>> {
+function searchClientsMock(
+  query: string,
+  _options?: ClientServiceOptions,
+): Promise<Array<Client>> {
   const normalized = query.trim().toLowerCase()
   if (!normalized) return Promise.resolve(seedClients)
   return Promise.resolve(
@@ -208,7 +213,10 @@ function searchClientsMock(query: string): Promise<Array<Client>> {
   )
 }
 
-function createClientMock(input: CreateClientInput): Promise<Client> {
+function createClientMock(
+  input: CreateClientInput,
+  _options?: ClientServiceOptions,
+): Promise<Client> {
   const client: Client = {
     id: `mock-${Math.random().toString(36).slice(2, 8)}`,
     name: input.name,

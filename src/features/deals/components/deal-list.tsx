@@ -24,6 +24,7 @@ import {
   useDealsQuery,
   useUpdateDealStatusMutation,
 } from '@/features/deals/hooks/use-deals'
+import { useAuth } from '@/features/auth/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 const STATUS_META: Record<DealStatus, { label: string; tone: string }> = {
@@ -99,16 +100,19 @@ function DealNotes({ deal }: { deal: DealWithRelations }) {
 function QuickNoteForm({ deal }: { deal: DealWithRelations }) {
   const [value, setValue] = useState('')
   const addNoteMutation = useAddDealNoteMutation()
+  const { user } = useAuth()
+
+  const disabled = addNoteMutation.isPending || !user?.id
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!value.trim()) return
+    if (!value.trim() || !user?.id) return
 
     try {
       await addNoteMutation.mutateAsync({
-        id: deal.id,
-        content: value,
-        author: deal.advisor,
+        deal_id: deal.id,
+        text: value,
+        user_id: user.id,
       })
       setValue('')
     } catch (error) {
@@ -123,6 +127,7 @@ function QuickNoteForm({ deal }: { deal: DealWithRelations }) {
         onChange={(event) => setValue(event.target.value)}
         placeholder="Agregar nota rápida"
         className="h-9"
+        disabled={disabled}
       />
       <button
         type="submit"
@@ -140,6 +145,19 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
 
   const statusMeta = STATUS_META[deal.status]
 
+  const productLabel = useMemo(() => {
+    if (!deal.product) return null
+    const base = [deal.product.brand, deal.product.model, deal.product.variant]
+      .filter(Boolean)
+      .join(' ')
+
+    if (!base) {
+      return null
+    }
+
+    return deal.product.year ? `${base} · ${deal.product.year}` : base
+  }, [deal.product])
+
   const handleStatusChange = async (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -148,6 +166,11 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
       await updateStatusMutation.mutateAsync({
         id: deal.id,
         status: nextStatus,
+        advisor_id: deal.advisor_id ?? null,
+        client_id: deal.client_id,
+        product_id: deal.product_id ?? null,
+        scheduled_for: deal.scheduled_for,
+        notes: null,
       })
     } catch (error) {
       console.error('No se pudo actualizar la gestión', error)
@@ -159,11 +182,11 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
       <header className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold text-foreground">
-            {deal.title}
+            {deal.client?.name ?? 'Cliente sin nombre'}
           </h3>
           <p className="text-xs text-foreground/70">
             <UserRoundIcon className="mr-2 inline size-4 text-brand" />
-            {deal.advisor_id}
+            {deal.advisor_id ?? 'Sin asesor asignado'}
           </p>
         </div>
         <span
@@ -178,21 +201,17 @@ function DealCard({ deal }: { deal: DealWithRelations }) {
       </header>
 
       <section className="space-y-3 text-sm text-foreground/80">
-        <p>
-          <strong>Cliente:</strong> {deal.client?.name ?? 'Sin datos'}
-        </p>
-        {deal.product ? (
+        {productLabel ? (
           <p>
-            <strong>Producto:</strong>{' '}
-            {deal.product.brand +
-              ' ' +
-              deal.product.model +
-              ' ' +
-              deal.product.variant +
-              ' - ' +
-              deal.product.year}
+            <strong>Producto:</strong> {productLabel}
           </p>
-        ) : null}
+        ) : (
+          <p className="text-foreground/60">Sin producto asignado</p>
+        )}
+        <p>
+          <strong>Contacto:</strong>{' '}
+          {deal.client?.phone ?? 'Sin teléfono registrado'}
+        </p>
         <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.35em] text-brand">
           <CalendarClockIcon className="size-4" />{' '}
           {formatDateTime(deal.scheduled_for)}
@@ -238,8 +257,14 @@ export function DealList() {
 
   const advisors = useMemo(() => {
     const values = new Set<string>()
-    deals.forEach((deal) => values.add(deal.advisor))
-    return Array.from(values).sort()
+    deals.forEach((deal) => values.add(deal.advisor_id ?? 'sin_asignar'))
+
+    return Array.from(values)
+      .map((value) => ({
+        value,
+        label: value === 'sin_asignar' ? 'Sin asesor asignado' : value,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'es'))
   }, [deals])
 
   const filteredDeals = useMemo(() => {
@@ -247,7 +272,9 @@ export function DealList() {
       const statusMatches =
         statusFilter === 'all' ? true : deal.status === statusFilter
       const advisorMatches =
-        advisorFilter === 'all' ? true : deal.advisor === advisorFilter
+        advisorFilter === 'all'
+          ? true
+          : (deal.advisor_id ?? 'sin_asignar') === advisorFilter
       return statusMatches && advisorMatches
     })
   }, [advisorFilter, deals, statusFilter])
@@ -289,8 +316,8 @@ export function DealList() {
             >
               <option value="all">Todos los asesores</option>
               {advisors.map((advisor) => (
-                <option key={advisor} value={advisor}>
-                  {advisor}
+                <option key={advisor.value} value={advisor.value}>
+                  {advisor.label}
                 </option>
               ))}
             </select>

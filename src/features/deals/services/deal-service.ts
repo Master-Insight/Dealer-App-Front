@@ -244,9 +244,9 @@ async function listDealsWithRelationsApi(
   const accessToken = ensureAccessToken(options)
 
   const [deals, clients, products] = await Promise.all([
-    listDeals(),
-    listClients(),
-    listProducts(),
+    listDeals({ accessToken }),
+    listClients({ accessToken }),
+    listProducts({ accessToken }),
   ])
 
   const clientMap = new Map(clients.map((client) => [client.id, client]))
@@ -370,7 +370,7 @@ async function addDealNoteApi(
   return getDealApi(input.deal_id, accessToken)
 }
 
-function listDealsMock(): Promise<Array<Deal>> {
+function listDealsMock(_options?: DealServiceOptions): Promise<Array<Deal>> {
   return Promise.resolve(
     [...mockDeals]
       .map(cloneDeal)
@@ -382,11 +382,13 @@ function listDealsMock(): Promise<Array<Deal>> {
   )
 }
 
-async function listDealsWithRelationsMock(): Promise<Array<DealWithRelations>> {
+async function listDealsWithRelationsMock(
+  options?: DealServiceOptions,
+): Promise<Array<DealWithRelations>> {
   const [deals, clients, products] = await Promise.all([
-    listDealsMock(),
-    listClients(),
-    listProducts(),
+    listDealsMock(options),
+    listClients(options ? { accessToken: options.accessToken } : undefined),
+    listProducts(options ? { accessToken: options.accessToken } : undefined),
   ])
 
   const clientMap = new Map(clients.map((client) => [client.id, client]))
@@ -401,9 +403,10 @@ async function listDealsWithRelationsMock(): Promise<Array<DealWithRelations>> {
 
 async function searchDealsMock(
   term: string,
+  options?: DealServiceOptions,
 ): Promise<Array<DealWithRelations>> {
   const normalized = term.trim().toLowerCase()
-  const deals = await listDealsWithRelationsMock()
+  const deals = await listDealsWithRelationsMock(options)
   if (!normalized) {
     return deals
   }
@@ -430,7 +433,10 @@ async function searchDealsMock(
   })
 }
 
-function createDealMock(input: CreateDealInput): Promise<Deal> {
+function createDealMock(
+  input: CreateDealInput,
+  _options?: DealServiceOptions,
+): Promise<Deal> {
   const now = new Date().toISOString()
   const deal: Deal = {
     id: `mock-deal-${Math.random().toString(36).slice(2, 10)}`,
@@ -461,7 +467,10 @@ function createDealMock(input: CreateDealInput): Promise<Deal> {
   return Promise.resolve(cloneDeal(deal))
 }
 
-function updateDealStatusMock(input: UpdateDealStatusInput): Promise<Deal> {
+function updateDealStatusMock(
+  input: UpdateDealStatusInput,
+  _options?: DealServiceOptions,
+): Promise<Deal> {
   const index = mockDeals.findIndex((deal) => deal.id === input.id)
   if (index === -1) {
     throw new Error('No se encontró la gestión solicitada.')
@@ -501,7 +510,10 @@ function updateDealStatusMock(input: UpdateDealStatusInput): Promise<Deal> {
   return Promise.resolve(cloneDeal(updated))
 }
 
-function addDealNoteMock(input: AddDealNoteInput): Promise<Deal> {
+function addDealNoteMock(
+  input: AddDealNoteInput,
+  _options?: DealServiceOptions,
+): Promise<Deal> {
   const index = mockDeals.findIndex((deal) => deal.id === input.deal_id)
   if (index === -1) {
     throw new Error('No se encontró la gestión solicitada.')
