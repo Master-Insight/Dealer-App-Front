@@ -58,6 +58,7 @@ const PRODUCT_STATUS_FROM_API: Record<ProductStatusApi, ProductStatus> = {
   archived: 'baja',
 }
 
+// 🔹 MOCK DE PRODUCTOS
 const seedProducts: Array<Product> = [
   {
     id: '1b802216-6d1a-4ce7-b75f-88f3a5cd2c26',
@@ -203,6 +204,8 @@ async function listProductsApi(
       query: { page_size: 100 },
     },
   )
+
+  console.log(response)
 
   return response.data
     .map(mapProduct)

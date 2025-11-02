@@ -4,8 +4,14 @@ import {
   ArrowUpDownIcon,
   BadgeCheckIcon,
   BoxesIcon,
+  CalendarIcon,
+  FuelIcon,
+  GaugeIcon,
   Loader2Icon,
+  MapPinIcon,
   SearchIcon,
+  Settings2Icon,
+  TagIcon,
 } from 'lucide-react'
 
 import type { Product, ProductStatus } from '@/features/products/types/product'
@@ -24,34 +30,34 @@ import {
 import { cn } from '@/lib/utils'
 
 const STATUS_LABELS: Record<ProductStatus, { label: string; tone: string }> = {
-  available: {
+  disponible: {
     label: 'Disponible',
     tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
   },
-  reserved: {
+  reservado: {
     label: 'Reservado',
     tone: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
   },
-  sold: { label: 'Vendido', tone: 'bg-brand-alt/10 text-brand-alt' },
-  retired: {
+  vendido: { label: 'Vendido', tone: 'bg-brand-alt/10 text-brand-alt' },
+  baja: {
     label: 'Fuera de catálogo',
     tone: 'bg-slate-200 text-slate-700 dark:bg-slate-500/20 dark:text-slate-200',
   },
 }
 
 const STATUS_OPTIONS: Array<{ value: ProductStatus; label: string }> = [
-  { value: 'available', label: 'Disponible' },
-  { value: 'reserved', label: 'Reservado' },
-  { value: 'sold', label: 'Vendido' },
-  { value: 'retired', label: 'Fuera de catálogo' },
+  { value: 'disponible', label: 'Disponible' },
+  { value: 'reservado', label: 'Reservado' },
+  { value: 'vendido', label: 'Vendido' },
+  { value: 'baja', label: 'Fuera de catálogo' },
 ]
 
 const STATUS_FILTERS: Array<{ value: ProductStatus | 'all'; label: string }> = [
   { value: 'all', label: 'Todos' },
-  { value: 'available', label: 'Disponibles' },
-  { value: 'reserved', label: 'Reservados' },
-  { value: 'sold', label: 'Vendidos' },
-  { value: 'retired', label: 'Fuera de catálogo' },
+  { value: 'disponible', label: 'Disponibles' },
+  { value: 'reservado', label: 'Reservados' },
+  { value: 'vendido', label: 'Vendidos' },
+  { value: 'baja', label: 'Fuera de catálogo' },
 ]
 
 function formatCurrency(value: number | null | undefined) {
@@ -94,56 +100,107 @@ function ProductRow({ product }: { product: Product }) {
 
   const statusBadge = STATUS_LABELS[product.state]
 
+  // 🔹 Color del estado visual
+  const statusColor = {
+    disponible: 'bg-green-500/10 text-green-700 border-green-500/30',
+    reservado: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/30',
+    vendido: 'bg-red-500/10 text-red-700 border-red-500/30',
+    baja: 'bg-gray-400/10 text-gray-700 border-gray-400/30',
+  }[product.state]
+
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-card/70 p-5 shadow-sm transition hover:border-brand/40 hover:shadow-lg">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">
-            {product.name}
-          </h3>
-          {product.model ? (
-            <p className="text-xs uppercase tracking-[0.35em] text-foreground/60">
-              {product.model}
-            </p>
+    <li className="grid gap-3 rounded-2xl border border-border/40 bg-card/70 p-5 shadow-sm transition hover:border-brand/40 hover:shadow-md md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="space-y-1">
+        <p className="text-base font-semibold text-foreground">
+          {product.brand} {product.model}
+          {product.variant ? (
+            <span className="text-foreground/60"> • {product.variant}</span>
+          ) : null}
+        </p>
+
+        {/* Subdetalles del vehículo */}
+        <div className="flex flex-wrap items-center gap-3 text-xs text-foreground/70">
+          {product.year ? (
+            <span className="inline-flex items-center gap-1">
+              <CalendarIcon className="size-3.5" />
+              {product.year}
+            </span>
+          ) : null}
+          {product.mileage ? (
+            <span className="inline-flex items-center gap-1">
+              <GaugeIcon className="size-3.5" />
+              {product.mileage.toLocaleString()} km
+            </span>
+          ) : null}
+          {product.fuel_type ? (
+            <span className="inline-flex items-center gap-1">
+              <FuelIcon className="size-3.5" />
+              {product.fuel_type}
+            </span>
+          ) : null}
+          {product.transmission ? (
+            <span className="inline-flex items-center gap-1">
+              <Settings2Icon className="size-3.5" />
+              {product.transmission}
+            </span>
+          ) : null}
+          {product.color ? (
+            <span className="inline-flex items-center gap-1">
+              <TagIcon className="size-3.5" />
+              {product.color}
+            </span>
           ) : null}
         </div>
+
+        {/* Ubicación y precio */}
+        <div className="flex flex-wrap items-center gap-3 text-xs text-foreground/70">
+          {product.location ? (
+            <span className="inline-flex items-center gap-1">
+              <MapPinIcon className="size-3.5" />
+              {product.location}
+            </span>
+          ) : null}
+          {product.price ? (
+            <span className="font-semibold text-foreground">
+              ${product.price.toLocaleString('es-AR')}
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Estado y fecha */}
+      <div className="flex flex-col items-end justify-between text-xs text-foreground/50 md:items-end">
         <span
           className={cn(
-            'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide',
-            statusBadge.tone,
+            'inline-flex items-center gap-2 rounded-full border px-3 py-1 font-medium uppercase tracking-wide transition',
+            statusColor,
           )}
         >
-          <BadgeCheckIcon className="size-3" />
-          {statusBadge.label}
+          {product.state}
         </span>
-      </header>
 
-      {product.description ? (
-        <p className="text-sm text-foreground/70">{product.description}</p>
-      ) : null}
-
-      <footer className="flex flex-wrap items-center justify-between gap-3 text-xs text-foreground/60">
-        <span className="rounded-full border border-border/50 px-3 py-1 font-semibold text-foreground">
-          {formatCurrency(product.price ?? null)}
+        <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted/40 px-3 py-1 font-medium uppercase tracking-wide">
+          <CalendarIcon className="size-3" />
+          ACT: {updatedLabel}
         </span>
-        <span className="rounded-full border border-border/40 px-3 py-1">
-          Actualizado {updatedLabel}
-        </span>
-      </footer>
-    </article>
+      </div>
+    </li>
   )
 }
 
+// 🔹 Lista principal
 export function ProductList() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all')
 
   const { data: products = [], isLoading } = useProductsQuery(search)
+  console.log(products)
+
   const updateProductMutation = useUpdateProductMutation()
 
   const filteredProducts = useMemo(() => {
     if (statusFilter === 'all') return products
-    return products.filter((product) => product.status === statusFilter)
+    return products.filter((product) => product.state === statusFilter)
   }, [products, statusFilter])
 
   const handleStatusChange = async (
@@ -153,7 +210,7 @@ export function ProductList() {
     try {
       await updateProductMutation.mutateAsync({
         id: product.id,
-        status: nextStatus,
+        state: nextStatus,
       })
     } catch (error) {
       console.error('No se pudo actualizar el producto', error)
@@ -217,7 +274,7 @@ export function ProductList() {
                   </span>
                   <select
                     className="rounded-lg border border-border/40 bg-background px-2 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                    value={product.status}
+                    value={product.state}
                     onChange={(event) =>
                       handleStatusChange(
                         product,

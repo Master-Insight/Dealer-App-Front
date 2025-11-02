@@ -63,9 +63,6 @@ function ClientRow({ client }: { client: Client }) {
             </span>
           ) : null}
         </div>
-        {client.notes ? (
-          <p className="text-xs text-foreground/60">{client.notes}</p>
-        ) : null}
       </div>
       <div className="flex items-start justify-end text-xs text-foreground/50">
         <span className="inline-flex items-center gap-2 rounded-full bg-muted/40 px-3 py-1 font-medium uppercase tracking-wide">
