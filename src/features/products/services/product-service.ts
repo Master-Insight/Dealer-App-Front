@@ -205,8 +205,6 @@ async function listProductsApi(
     },
   )
 
-  console.log(response)
-
   return response.data
     .map(mapProduct)
     .sort(
@@ -294,7 +292,9 @@ async function updateProductApi(
   return mapProduct(product)
 }
 
-function listProductsMock(): Promise<Array<Product>> {
+function listProductsMock(
+  _options?: ProductServiceOptions,
+): Promise<Array<Product>> {
   return Promise.resolve(
     [...mockProducts].sort(
       (a, b) =>
@@ -303,7 +303,10 @@ function listProductsMock(): Promise<Array<Product>> {
   )
 }
 
-function searchProductsMock(term: string): Promise<Array<Product>> {
+function searchProductsMock(
+  term: string,
+  _options?: ProductServiceOptions,
+): Promise<Array<Product>> {
   const normalized = term.trim().toLowerCase()
   if (!normalized) {
     return listProductsMock()
@@ -319,7 +322,10 @@ function searchProductsMock(term: string): Promise<Array<Product>> {
   )
 }
 
-function createProductMock(input: CreateProductInput): Promise<Product> {
+function createProductMock(
+  input: CreateProductInput,
+  _options?: ProductServiceOptions,
+): Promise<Product> {
   const now = new Date().toISOString()
   const product: Product = {
     id: `mock-product-${Math.random().toString(36).slice(2, 10)}`,
@@ -347,7 +353,10 @@ function createProductMock(input: CreateProductInput): Promise<Product> {
   return Promise.resolve(product)
 }
 
-function updateProductMock(input: UpdateProductInput): Promise<Product> {
+function updateProductMock(
+  input: UpdateProductInput,
+  _options?: ProductServiceOptions,
+): Promise<Product> {
   const index = mockProducts.findIndex((product) => product.id === input.id)
   if (index === -1) {
     throw new Error('No se encontró el producto solicitado.')

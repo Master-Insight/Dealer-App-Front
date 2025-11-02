@@ -2,7 +2,6 @@
 import { useMemo, useState } from 'react'
 import {
   ArrowUpDownIcon,
-  BadgeCheckIcon,
   BoxesIcon,
   CalendarIcon,
   FuelIcon,
@@ -14,7 +13,11 @@ import {
   TagIcon,
 } from 'lucide-react'
 
-import type { Product, ProductStatus } from '@/features/products/types/product'
+import type {
+  Product,
+  ProductStatus,
+  UpdateProductInput,
+} from '@/features/products/types/product'
 import {
   Card,
   CardContent,
@@ -71,6 +74,31 @@ function formatCurrency(value: number | null | undefined) {
     }).format(value)
   } catch (_error) {
     return `${value}`
+  }
+}
+
+function buildUpdatePayload(
+  product: Product,
+  nextStatus: ProductStatus,
+): UpdateProductInput {
+  return {
+    id: product.id,
+    brand: product.brand,
+    model: product.model,
+    variant: product.variant ?? null,
+    year: product.year ?? null,
+    mileage: product.mileage ?? null,
+    fuel_type: product.fuel_type ?? null,
+    transmission: product.transmission ?? null,
+    color: product.color ?? null,
+    doors: product.doors ?? null,
+    location: product.location ?? null,
+    state: nextStatus,
+    description: product.description ?? null,
+    active: product.active ?? true,
+    price: product.price ?? null,
+    labels: product.labels ?? null,
+    vehicle_type: product.vehicle_type ?? null,
   }
 }
 
@@ -160,11 +188,9 @@ function ProductRow({ product }: { product: Product }) {
               {product.location}
             </span>
           ) : null}
-          {product.price ? (
-            <span className="font-semibold text-foreground">
-              ${product.price.toLocaleString('es-AR')}
-            </span>
-          ) : null}
+          <span className="font-semibold text-foreground">
+            {formatCurrency(product.price ?? null)}
+          </span>
         </div>
       </div>
 
@@ -194,7 +220,6 @@ export function ProductList() {
   const [statusFilter, setStatusFilter] = useState<ProductStatus | 'all'>('all')
 
   const { data: products = [], isLoading } = useProductsQuery(search)
-  console.log(products)
 
   const updateProductMutation = useUpdateProductMutation()
 
@@ -208,10 +233,9 @@ export function ProductList() {
     nextStatus: ProductStatus,
   ) => {
     try {
-      await updateProductMutation.mutateAsync({
-        id: product.id,
-        state: nextStatus,
-      })
+      await updateProductMutation.mutateAsync(
+        buildUpdatePayload(product, nextStatus),
+      )
     } catch (error) {
       console.error('No se pudo actualizar el producto', error)
     }

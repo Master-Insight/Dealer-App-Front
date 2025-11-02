@@ -1,5 +1,5 @@
 // src/features/products/components/product-form.tsx
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   CheckIcon,
   Loader2Icon,
@@ -11,9 +11,9 @@ import type {
   CreateProductInput,
   Product,
   ProductFuelType,
+  ProductStatus,
   ProductTransmision,
   ProductTypes,
-  ProductStatus,
 } from '@/features/products/types/product'
 import { Button } from '@/components/ui/button'
 import {
@@ -57,7 +57,7 @@ interface ProductFormProps {
   products: Array<Product>
 }
 
-export function ProductForm({ products }: ProductFormProps) {
+export function ProductForm({ products: _products }: ProductFormProps) {
   const [formState, setFormState] = useState<CreateProductInput>({
     company_id: null,
     brand: '',
@@ -82,6 +82,12 @@ export function ProductForm({ products }: ProductFormProps) {
 
   const createProductMutation = useCreateProductMutation()
 
+  const NULLABLE_FIELDS: Array<keyof CreateProductInput> = [
+    'fuel_type',
+    'transmission',
+    'vehicle_type',
+  ]
+
   const handleChange =
     (field: keyof CreateProductInput) =>
     (
@@ -90,6 +96,8 @@ export function ProductForm({ products }: ProductFormProps) {
       >,
     ) => {
       const value = event.target.value
+      const isNullableField = NULLABLE_FIELDS.includes(field)
+
       setFormState((prev) => ({
         ...prev,
         [field]:
@@ -97,7 +105,9 @@ export function ProductForm({ products }: ProductFormProps) {
             ? event.target.value === ''
               ? undefined
               : Number(value)
-            : value,
+            : isNullableField && value === ''
+              ? null
+              : value,
       }))
       setErrorMessage(null)
       setSuccessMessage(null)
