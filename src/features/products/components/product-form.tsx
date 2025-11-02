@@ -7,6 +7,7 @@ import {
   SparklesIcon,
 } from 'lucide-react'
 
+import type { Product, ProductStatus } from '@/features/products/types/product'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -17,7 +18,6 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { Product, ProductStatus } from '@/features/products/types/product'
 import { useCreateProductMutation } from '@/features/products/hooks/use-products'
 
 const STATUS_OPTIONS: Array<{ value: ProductStatus; label: string }> = [

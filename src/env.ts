@@ -14,6 +14,8 @@ export const env = createEnv({
     VITE_SUPABASE_ANON_KEY: z.string().min(1).optional(),
     VITE_API_URL: z.string().url().optional(),
     VITE_DATA_SOURCE_CLIENTS: z.enum(['api', 'mock']).default('api'),
+    VITE_DATA_SOURCE_PRODUCTS: z.enum(['api', 'mock']).default('api'),
+    VITE_DATA_SOURCE_DEALS: z.enum(['api', 'mock']).default('api'),
   },
 
   runtimeEnv: import.meta.env,

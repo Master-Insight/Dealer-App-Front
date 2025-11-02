@@ -8,6 +8,7 @@ import {
   SearchIcon,
 } from 'lucide-react'
 
+import type { Product, ProductStatus } from '@/features/products/types/product'
 import {
   Card,
   CardContent,
@@ -20,7 +21,6 @@ import {
   useProductsQuery,
   useUpdateProductMutation,
 } from '@/features/products/hooks/use-products'
-import type { Product, ProductStatus } from '@/features/products/types/product'
 import { cn } from '@/lib/utils'
 
 const STATUS_LABELS: Record<ProductStatus, { label: string; tone: string }> = {
@@ -84,15 +84,15 @@ function EmptyState() {
 
 function ProductRow({ product }: { product: Product }) {
   const updatedAt = useMemo(
-    () => new Date(product.updatedAt),
-    [product.updatedAt],
+    () => new Date(product.updated_at),
+    [product.updated_at],
   )
   const updatedLabel = updatedAt.toLocaleDateString(undefined, {
     day: '2-digit',
     month: 'short',
   })
 
-  const statusBadge = STATUS_LABELS[product.status]
+  const statusBadge = STATUS_LABELS[product.state]
 
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border/50 bg-card/70 p-5 shadow-sm transition hover:border-brand/40 hover:shadow-lg">
